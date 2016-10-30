@@ -88,13 +88,28 @@ indirect enum Element: CustomStringConvertible {
     }
 }
 
-func == (a: Element, b: Element) -> Bool {
-    //TODO: Quick hack, totally inefficient.
-    return a.description == b.description
+func == (lhs: Element, rhs: Element) -> Bool {
+    switch (lhs, rhs) {
+    case (.character(let a), .character(let b)):
+        return a == b
+    case (.subexpressionTree(let c), .subexpressionTree(let d)):
+        return c == d
+    default:
+        return false
+    }
 }
 
-func != (a: Element, b: Element) -> Bool {
-    return !(a == b)
+func == (lhs: ExpressionTree, rhs: ExpressionTree) -> Bool {
+    guard lhs.elements.count == rhs.elements.count else { return false }
+    for (index, lhsElement) in lhs.elements.enumerated() {
+        if lhsElement != rhs.elements[index] { return false }
+    }
+    
+    return true
+}
+
+func != (lhs: Element, rhs: Element) -> Bool {
+    return !(lhs == rhs)
 }
 
 // MARK: - Helpers
@@ -112,22 +127,22 @@ extension Array {
 
 // MARK: - Running
 
-func inputHandler(data: String) {
+func inputHandler(data: String) -> String {
     let components = data.components(separatedBy: "/")
     var tree = ExpressionTree(string: components[0])
     
-    if components.count == 2 {
+    if components.count >= 2 {
         let operations = components[1]
         for char in operations.characters {
-            if char == "R" {
+            if char == "R" || char == "r" {
                 tree = tree.reversed()
-            } else if char == "S" {
+            } else if char == "S" || char == "s" {
                 tree = tree.simplified()
             }
         }
     }
     
-    print(tree)
+    return tree.description
 }
 
 // MARK: - STDIN STDOUT
@@ -147,10 +162,27 @@ func readArrayOfStrings() -> [String] {
 
 var lines = readArrayOfStrings()
 for line in lines {
-    inputHandler(data: line)
+    print(inputHandler(data: line))
 }
 
 // MARK: - Testing
 
-inputHandler(data: "(ABC) / RS")
-inputHandler(data: "(AB)C((DE)F) / RSSR")
+func passesTestCases() -> Bool {
+    return inputHandler(data: "") == "" &&
+        inputHandler(data: "/") == "" &&
+        inputHandler(data: "/R") == "" &&
+        inputHandler(data: "A         A") == "AA" &&
+        inputHandler(data: "AB//R") == "AB" &&
+        inputHandler(data: "AB/r") == "BA" &&
+        inputHandler(data: "(AB)/s") == "AB" &&
+        inputHandler(data: "AB/R/") == "BA" &&
+        inputHandler(data: "AB/Z") == "AB" &&
+        inputHandler(data: "(AB)(CD(EF))/SS") == "AB(CDEF)" &&
+        inputHandler(data: "(AB)B/RSR/////") == "(AB)B" &&
+        inputHandler(data: "((((AB)C)D)E)F/S") == "ABCDEF" &&
+        inputHandler(data: "((((AB)C)D)E)F/RS") == "F(EDCBA)" &&
+        inputHandler(data: "(AB)((CDE)F)(G)/SRSR") == "AB(CDEF)G"
+}
+
+passesTestCases() ? print("PASSES TESTS") : print("FAILS TESTS")
+

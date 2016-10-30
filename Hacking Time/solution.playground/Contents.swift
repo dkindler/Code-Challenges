@@ -94,7 +94,7 @@ extension Character {
 }
 
 // MARK: - Testing
-var runTests = true
+var runTests = false
 
 // Using data given I was able to find the char offset to be "251220825122082" by checking the difference between the two strings
 var aliceKey = "Your friend, Alice".characterOffset(string: "Atvt hrqgse, Cnikg")
