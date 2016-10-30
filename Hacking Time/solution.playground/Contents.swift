@@ -115,7 +115,7 @@ if runTests {
 
 // The substring (1..<n) was the following:
 // "reetings friend, I have important info for you. The password to the secret treasure room is the word clocktower"
-// That just means the first last character on aliceKey needs to be popped to the front
+// That just means the last character on aliceKey needs to be popped to the front
 aliceKey.popCharacterToFront()
 
 // Lets verify:
