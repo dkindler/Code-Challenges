@@ -8,22 +8,22 @@ extension String {
         return Array(characters)[index]
     }
     
-    mutating func popToFront() {
+    mutating func popCharacterToFront() {
         guard self.characters.count > 1 else { return }
         if let poppedChar = self.characters.popLast() {
             self = String(describing: poppedChar) + self
         }
     }
     
-    func decrypt(with: String) -> String {
-        return rotated(by: with, isEncrypting: false)
+    func decrypt(key: String) -> String {
+        return rotated(by: key, isEncrypting: false)
     }
     
-    func encrypt(with: String) -> String {
-        return rotated(by: with, isEncrypting: true)
+    func encrypt(key: String) -> String {
+        return rotated(by: key, isEncrypting: true)
     }
     
-    func findCharOffsetsOf(string: String) -> String {
+    func characterOffset(string: String) -> String {
         guard self.characters.count == string.characters.count else { return "" }
         
         var result = ""
@@ -71,7 +71,7 @@ extension Character {
     }
     
     func getAlphabetIndex() -> Int {
-        guard isUppercase() || isLowercase() else { return -1 }
+        guard isAlphabetic() else { return -1 }
         return getAlphabet().index(of: self) ?? -1
     }
     
@@ -87,65 +87,44 @@ extension Character {
         }
     }
     
-    private func getAlphabet() -> [Character] {
+    func getAlphabet() -> [Character] {
         guard isAlphabetic() else { return [Character]() }
-        
-        let lowercase = Array("abcdefghijklmnopqrstuvwxyz".characters)
-        let uppercase = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ".characters)
-        return isUppercase() ? uppercase : lowercase
+        return isUppercase() ? Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ".characters) : Array("abcdefghijklmnopqrstuvwxyz".characters)
     }
 }
 
 // MARK: - Testing
-var runTests = false
+var runTests = true
 
-// Using data given, I was able to find the char offset to be "251220825122082" by checking the difference between the two string
-var aliceKey = "Your friend, Alice".findCharOffsetsOf(string: "Atvt hrqgse, Cnikg")
+// Using data given I was able to find the char offset to be "251220825122082" by checking the difference between the two strings
+var aliceKey = "Your friend, Alice".characterOffset(string: "Atvt hrqgse, Cnikg")
 
 // There seems to be repeated chars in aliceKey, so lets assume aliceKey is actually "2512208"
 aliceKey = "2512208"
 
-// Loop through substrings (0..<n), (1..<n), (2..<n) ... (n-2..<n) and see if I can find any english in the results
+// Loop through substrings [(0..<n), (1..<n), (2..<n) ... (n-2..<n)] and see if I can find any english in the results
 let encryptedString = "Otjfvknou kskgnl, K mbxg iurtsvcnb ksgq hoz atv. Vje xcxtyqrl vt ujg smewfv vrmcxvtg rwqr ju vhm ytsf elwepuqyez"
-var startIndexInt = 0
 
 if runTests {
-    while startIndexInt < encryptedString.characters.count {
-        let startIndex = encryptedString.index(encryptedString.startIndex, offsetBy: startIndexInt)
-        
+    for var i in 0..<encryptedString.characters.count {
+        let startIndex = encryptedString.index(encryptedString.startIndex, offsetBy: i)
         let subString = encryptedString[startIndex..<encryptedString.endIndex]
-        print("\(startIndexInt)) \(subString.decrypt(with: aliceKey))")
-        
-        startIndexInt += 1
+        print("\(i)) \(subString.decrypt(key: aliceKey))")
     }
 }
 
-// The substring (8..<n) was the following:
-// "s friend, I have important info for you. The password to the secret treasure room is the word clocktower"
-// Now I just need to find (0..<8)
-// Lets try to rearrange aliceKey
-if runTests {
-    var key = aliceKey
-    let subString = encryptedString.substring(to: encryptedString.index(encryptedString.startIndex, offsetBy: 8))
-    for _ in 0..<key.characters.count {
-        key.popToFront()
-        print("Key \(key): \(subString.decrypt(with: key))")
-    }
-}
+// The substring (1..<n) was the following:
+// "reetingss friend, I have important info for you. The password to the secret treasure room is the word clocktower"
+// That just means the first last character on aliceKey needs to be popped to the front
+aliceKey.popCharacterToFront()
 
-// With the very first itteration it became apparent "8251220" is aliceKey
-// So, just to verify:
+// Lets verify:
 if runTests {
-    aliceKey = "8251220"
-    print(encryptedString.decrypt(with: aliceKey))
+    print(encryptedString.decrypt(key: aliceKey))
 }
 
 // MARK: - HackerRank Tester
 
 func decrypt(encrypted_message: String) -> String {
-    return encrypted_message.decrypt(with: aliceKey)
+    return encrypted_message.decrypt(key: aliceKey)
 }
-
-
-
-
