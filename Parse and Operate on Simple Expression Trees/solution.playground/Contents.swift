@@ -168,20 +168,30 @@ for line in lines {
 // MARK: - Testing
 
 func passesTestCases() -> Bool {
-    return inputHandler(data: "") == "" &&
-        inputHandler(data: "/") == "" &&
-        inputHandler(data: "/R") == "" &&
-        inputHandler(data: "A         A") == "AA" &&
-        inputHandler(data: "AB//R") == "AB" &&
-        inputHandler(data: "AB/r") == "BA" &&
-        inputHandler(data: "(AB)/s") == "AB" &&
-        inputHandler(data: "AB/R/") == "BA" &&
-        inputHandler(data: "AB/Z") == "AB" &&
-        inputHandler(data: "(AB)(CD(EF))/SS") == "AB(CDEF)" &&
-        inputHandler(data: "(AB)B/RSR/////") == "(AB)B" &&
-        inputHandler(data: "((((AB)C)D)E)F/S") == "ABCDEF" &&
-        inputHandler(data: "((((AB)C)D)E)F/RS") == "F(EDCBA)" &&
-        inputHandler(data: "(AB)((CDE)F)(G)/SRSR") == "AB(CDEF)G"
+    
+    let tests = ["": "",
+                 "/": "",
+                 "/R": "",
+                 "A      A": "AA",
+                 "AB//R": "AB",
+                 "AB/r": "BA",
+                 "(AB)/s": "AB",
+                 "AB/R/": "BA",
+                 "AB/Z": "AB",
+                 "(AB)(CD(EF))/SS": "AB(CDEF)",
+                 "(AB)B/RSR/////":"(AB)B",
+                 "((((AB)C)D)E)F/S": "ABCDEF",
+                 "((((AB)C)D)E)F/RS": "F(EDCBA)",
+                 "(AB)((CDE)F)(G)/SRSR": "AB(CDEF)G"]
+    for input in tests.keys {
+        
+        if let expectedResult = tests[input], expectedResult != inputHandler(data: input) {
+            print("\(input) != \(expectedResult). Should be \(inputHandler(data: input))")
+            return false
+        }
+    }
+    
+    return true
 }
 
 passesTestCases() ? print("PASSES TESTS") : print("FAILS TESTS")
