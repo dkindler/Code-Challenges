@@ -6,6 +6,7 @@ struct ExpressionTree: CustomStringConvertible {
     var elements = [Element]()
 
     init(string: String) {
+        
         var elements = [Element]()
         for character in string.characters {
             guard character != " " else { continue }
@@ -168,9 +169,9 @@ for line in lines {
 // MARK: - Testing
 
 func passesTestCases() -> Bool {
-    
     let tests = ["": "",
                  "/": "",
+                 "()/S": "",
                  "/R": "",
                  "A      A": "AA",
                  "AB//R": "AB",
@@ -183,6 +184,7 @@ func passesTestCases() -> Bool {
                  "((((AB)C)D)E)F/S": "ABCDEF",
                  "((((AB)C)D)E)F/RS": "F(EDCBA)",
                  "(AB)((CDE)F)(G)/SRSR": "AB(CDEF)G"]
+    
     for input in tests.keys {
         
         if let expectedResult = tests[input], expectedResult != inputHandler(data: input) {
@@ -195,4 +197,14 @@ func passesTestCases() -> Bool {
 }
 
 passesTestCases() ? print("PASSES TESTS") : print("FAILS TESTS")
+
+
+
+print(inputHandler(data: "()/s"))
+
+
+
+
+
+
 
