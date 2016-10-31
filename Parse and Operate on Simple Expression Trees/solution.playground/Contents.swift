@@ -6,7 +6,6 @@ struct ExpressionTree: CustomStringConvertible {
     var elements = [Element]()
 
     init(string: String) {
-        
         var elements = [Element]()
         for character in string.characters {
             guard character != " " else { continue }
@@ -30,10 +29,29 @@ struct ExpressionTree: CustomStringConvertible {
         return elements.map({ $0.description }).joined()
     }
     
+    
+    /**
+     Removes all subExpressionTrees in an ExpressionTree
+     
+         let ep = ExpressionTree("(abc)")
+         print(ep)            // "(abc)"
+         print(ep.flatten())  // "abc"
+     
+     - returns: flattened ExpressionTree
+     */
     func flattened() -> ExpressionTree {
         return ExpressionTree(elements.flatMap { $0.flattened() } )
     }
     
+    /**
+     Reverses all elements in an ExpressionTree
+     
+         let ep = ExpressionTree("(abc)")
+         print(ep)            // "(abc)"
+         print(ep.reversed()) // "(cba)"
+     
+     - returns: reversed ExpressionTree
+     */
     func reversed() -> ExpressionTree {
         let reversed = self.elements.reversed().flatMap { element -> [Element] in
             switch element {
@@ -47,6 +65,17 @@ struct ExpressionTree: CustomStringConvertible {
         return ExpressionTree(reversed)
     }
     
+    
+    /**
+     Flattens first element in ExpressionTree, and all elements inside of
+     any subExpressionTrees
+     
+         let ep = ExpressionTree("(abc)")
+         print(ep)            // "(abc)"
+         print(ep.reversed()) // "(cba)"
+     
+     - returns: simplified ExpressionTree
+     */
     func simplified() -> ExpressionTree {
         guard let first = self.elements.first else { return self }
         
@@ -79,6 +108,12 @@ indirect enum Element: CustomStringConvertible {
         }
     }
     
+    
+    /**
+     Flattens out element if element is a subExpressionTree
+     
+     - returns: Array of Elements
+     */
     func flattened() -> [Element] {
         switch self {
         case .character:
@@ -116,6 +151,15 @@ func != (lhs: Element, rhs: Element) -> Bool {
 // MARK: - Helpers
 
 extension Array {
+    
+    /**
+     Pops elements in an Array until boolean statement is satisfied
+     
+     - parameters:
+       - condition: Condition to be satisfied for popping to complete
+     
+     - returns: Array of popped elements
+     */
     mutating func popWhile(condition: (Element) -> Bool) -> [Element] {
         var popped = [Element]()
         while let lastElement = popLast(), condition(lastElement) {
@@ -168,25 +212,8 @@ for line in lines {
 
 // MARK: - Testing
 
-func passesTestCases() -> Bool {
-    let tests = ["": "",
-                 "/": "",
-                 "()/S": "",
-                 "/R": "",
-                 "A      A": "AA",
-                 "AB//R": "AB",
-                 "AB/r": "BA",
-                 "(AB)/s": "AB",
-                 "AB/R/": "BA",
-                 "AB/Z": "AB",
-                 "(AB)(CD(EF))/SS": "AB(CDEF)",
-                 "(AB)B/RSR/////":"(AB)B",
-                 "((((AB)C)D)E)F/S": "ABCDEF",
-                 "((((AB)C)D)E)F/RS": "F(EDCBA)",
-                 "(AB)((CDE)F)(G)/SRSR": "AB(CDEF)G"]
-    
+func passesTestCases(_ tests: [String: String]) -> Bool {
     for input in tests.keys {
-        
         if let expectedResult = tests[input], expectedResult != inputHandler(data: input) {
             print("\(input) != \(expectedResult). Should be \(inputHandler(data: input))")
             return false
@@ -196,11 +223,23 @@ func passesTestCases() -> Bool {
     return true
 }
 
-passesTestCases() ? print("PASSES TESTS") : print("FAILS TESTS")
+let tests = ["": "",
+             "/": "",
+             "()/S": "",
+             "/R": "",
+             "A      A": "AA",
+             "AB//R": "AB",
+             "AB/r": "BA",
+             "(AB)/s": "AB",
+             "AB/R/": "BA",
+             "AB/Z": "AB",
+             "(AB)(CD(EF))/SS": "AB(CDEF)",
+             "(AB)B/RSR/////":"(AB)B",
+             "((((AB)C)D)E)F/S": "ABCDEF",
+             "((((AB)C)D)E)F/RS": "F(EDCBA)",
+             "(AB)((CDE)F)(G)/SRSR": "AB(CDEF)G"]
 
-
-
-print(inputHandler(data: "()/s"))
+passesTestCases(tests) ? print("PASSES TESTS") : print("FAILS TESTS")
 
 
 
