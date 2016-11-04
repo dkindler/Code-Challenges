@@ -239,7 +239,9 @@ let tests = ["": "",
              "((((AB)C)D)E)F/RS": "F(EDCBA)",
              "(AB)((CDE)F)(G)/SRSR": "AB(CDEF)G"]
 
-passesTestCases(tests) ? print("PASSES TESTS") : print("FAILS TESTS")
+let test2 = ["(AB)C/": "(AB)C", "(AB)C/S": "ABC", "(AB)C/RS": "C(BA)", "A(BC)/RS": "CBA", "A(BC)/RSR": "ABC"]
+
+passesTestCases(test2) ? print("PASSES TESTS") : print("FAILS TESTS")
 
 
 
